@@ -5,7 +5,7 @@ files:
     destination: /home/ubuntu
 hooks:
   AfterInstall:
-    - location: npm.sh
+    - location: share.sh
       timeout: 300
   ApplicationStart:
     - location: start.sh
