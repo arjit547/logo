@@ -4,7 +4,7 @@ files:
   - source: /
     destination: /home/ubuntu
 hooks:
-  BeforeInstall:
+  AfterInstall:
     - location: share.sh
       timeout: 300
   ApplicationStart:
