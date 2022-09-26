@@ -17,7 +17,11 @@ phases:
 artifacts:
   # include all files required to run application
   # notably excluded is node_modules, as this will cause overwrite error on deploy
+  type: zip
   files:
-    - appspec.yml
-    - '**/*'
+    - README.md
+    - S3.tf
+    - codebuild.tf
+    - pipeline.tf
+    
   
