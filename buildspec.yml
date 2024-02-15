@@ -3,8 +3,6 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      #- echo "Setting up environment variables"
-      #- export MY_SECRET_KEY=$MY_HOME_TEST
 
       - echo "Installing Git"
       - apt-get update
