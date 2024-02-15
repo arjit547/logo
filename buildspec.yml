@@ -1,31 +1,32 @@
 version: 0.2
 
 phases:
-  install:
-    runtime-versions:
-      nodejs: 16
-
   pre_build:
     commands:
-      - npm install
+      #- echo "Setting up environment variables"
+      #- export MY_SECRET_KEY=$MY_HOME_TEST
+
+      - echo "Installing Git"
+      - apt-get update
+      - apt-get install git -y
+      - pwd
+      - ls -al
+
+      - echo "Installing Git secrets"
+      - wget --quiet https://github.com/awslabs/git-secrets/archive/1.3.0.tar.gz
+      - tar -xzf 1.3.0.tar.gz
+      - cd git-secrets-1.3.0 && sudo make install && cd ..
+      - git-secrets --register-aws
+      - git-secrets --scan -r .
+      - if git-secrets --scan -r . | grep -q 'ERROR'; then exit 1; fi
 
   build:
     commands:
+      - echo "Installing npm dependencies"
+      - npm install
+
+      - echo "Building the project"
       - npm run build
-
-  post_build:
-    commands:
-      # Install Snyk
-      - npm install -g snyk
-
-      # Authenticate Snyk with your Snyk account
-      - snyk auth $SNYK_TOKEN
-
-      # Run Snyk test to check for vulnerabilities
-      - snyk test
-
-      # Sync the build artifacts to S3 bucket
-      - aws s3 sync build/ s3://${BUCKET_NAME} 
 
 artifacts:
   files: '**/*'
