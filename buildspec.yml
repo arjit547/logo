@@ -3,7 +3,6 @@ version: 0.2
 phases:
   pre_build:
     commands:
-
       - echo "Installing Git"
       - apt-get update
       - apt-get install git -y
@@ -18,13 +17,19 @@ phases:
       - git-secrets --scan -r .
       - if git-secrets --scan -r . | grep -q 'ERROR'; then exit 1; fi
 
-  build:
-    commands:
       - echo "Installing npm dependencies"
       - npm install
 
+  build:
+    commands:
       - echo "Building the project"
       - npm run build
+
+      - echo "Installing SonarQube Scanner"
+      - npm install -g sonarqube-scanner@latest
+
+      - echo "Running SonarCloud analysis"
+      - sonar-scanner -Dsonar.projectKey=arjit547_logo -Dsonar.organization=arjit547 -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${SONAR_LOGIN} -Dsonar.qualitygate.wait=true
 
 artifacts:
   files: '**/*'
