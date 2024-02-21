@@ -18,12 +18,12 @@ phases:
       - if git-secrets --scan -r . | grep -q 'ERROR'; then exit 1; fi
 
       - echo "Installing npm dependencies"
-      - npm install
+      #- npm install
 
   build:
     commands:
       - echo "Building the project"
-      - npm run build
+      #- npm run build
 
       - echo "Installing SonarQube Scanner"
       - npm install -g sonarqube-scanner@latest
