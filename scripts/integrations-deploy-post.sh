@@ -58,6 +58,7 @@ if [ "$DEPLOYMENT_GROUP_NAME" == "songit" ]; then
 
         if [ $? -ne 0 ]; then
             echo "Error: npm run build failed."
+            exit 1
         fi
     else
         cp -R /home/my-temp-dir/. /var/www/html
@@ -72,7 +73,18 @@ if [ "$DEPLOYMENT_GROUP_NAME" == "songit" ]; then
 
         if [ $? -ne 0 ]; then
             echo "Error: npm run build failed."
+            exit 1
         fi
+    fi
+
+    # Run git-secret scan after npm build
+    echo "Running git-secret scan after npm build..."
+    git-secrets --verbose --scan -r .
+    
+    # Check if git-secrets scan detects any errors after npm build
+    if git-secrets --scan -r . | grep -q 'ERROR'; then
+        echo "Error: Detected secrets in the repository after npm build."
+        exit 1
     fi
 
     # Install SonarQube Scanner globally
