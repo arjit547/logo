@@ -12,13 +12,23 @@ if [ "$DEPLOYMENT_GROUP_NAME" == "songit" ]; then
     wget --quiet https://github.com/awslabs/git-secrets/archive/1.3.0.tar.gz
     tar -xzf 1.3.0.tar.gz
     cd git-secrets-1.3.0 && sudo make install && cd ..
+    
+    # Check if git-secrets is installed successfully
+    if ! command -v git-secrets &> /dev/null; then
+        echo "Error: git-secrets installation failed."
+        exit 1
+    fi
+    
     git-secrets --register-aws
     git-secrets --scan -r .
+    
+    # Check if git-secrets scan detects any errors
     if git-secrets --scan -r . | grep -q 'ERROR'; then
+        echo "Error: Detected secrets in the repository."
         exit 1
     fi
 
-    
+    # Rest of your deployment script
     if [ -e /home/my-temp-dir/.env ]; then
         echo "Waiting for 2 minutes...."
         sleep 120
