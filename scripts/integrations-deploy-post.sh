@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$DEPLOYMENT_GROUP_NAME" == "nodesymk" ]; then
+if [ "$DEPLOYMENT_GROUP_NAME" == "songit" ]; then
     # Installing Git and Git secrets
     echo "Installing Git"
     apt-get update
