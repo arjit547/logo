@@ -24,8 +24,17 @@ if [ "$DEPLOYMENT_GROUP_NAME" == "songit" ]; then
         exit 1
     fi
     
+    # Run git-secret scan with verbose mode
+    echo "Scanning repository for secrets..."
+    git-secrets --verbose --list
+
+    # Register AWS patterns for git-secrets
+    echo "Registering AWS patterns for git-secrets"
     git-secrets --register-aws
-    git-secrets --scan -r .
+
+    # Run git-secret scan again after registering patterns
+    echo "Scanning repository again after registering patterns..."
+    git-secrets --verbose --scan -r .
     
     # Check if git-secrets scan detects any errors
     if git-secrets --scan -r . | grep -q 'ERROR'; then
