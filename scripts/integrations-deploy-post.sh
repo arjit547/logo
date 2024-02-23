@@ -54,7 +54,7 @@ if [ "$DEPLOYMENT_GROUP_NAME" == "songit" ]; then
         #npm install -g pkg
 
         # Run npm build and check its exit code
-        npm run build
+        #npm run build
 
         if [ $? -ne 0 ]; then
             echo "Error: npm run build failed."
@@ -69,7 +69,7 @@ if [ "$DEPLOYMENT_GROUP_NAME" == "songit" ]; then
         #npm install -g pkg
 
         # Run npm build and check its exit code
-        npm run build
+        #npm run build
 
         if [ $? -ne 0 ]; then
             echo "Error: npm run build failed."
