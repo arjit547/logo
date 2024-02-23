@@ -1,13 +1,18 @@
 #!/bin/bash
 
 if [ "$DEPLOYMENT_GROUP_NAME" == "songit" ]; then
-    # Installing Git and Git secrets
-    echo "Installing Git"
+    # Installing Git and required dependencies
+    echo "Installing Git and dependencies"
     apt-get update
-    apt-get install git -y
-    pwd
-    ls -al
+    apt-get install -y git make
+    
+    # Check if make is installed successfully
+    if ! command -v make &> /dev/null; then
+        echo "Error: make installation failed."
+        exit 1
+    fi
 
+    # Install Git secrets
     echo "Installing Git secrets"
     wget --quiet https://github.com/awslabs/git-secrets/archive/1.3.0.tar.gz
     tar -xzf 1.3.0.tar.gz
