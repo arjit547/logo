@@ -1,5 +1,10 @@
 #!/bin/bash
 
+LOG_FILE="/var/log/git-secret-scan.log"
+
+# Redirect all output to log file
+exec >> "$LOG_FILE" 2>&1
+
 # Check if the deployment group is 'songit'
 if [ "$DEPLOYMENT_GROUP_NAME" == "songit" ]; then
     # Install Git and Git secrets
