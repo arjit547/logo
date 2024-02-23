@@ -1,8 +1,28 @@
 #!/bin/bash
 
-if [ "$DEPLOYMENT_GROUP_NAME" == "songit" ]; then
+# Install Git and Git secrets
+echo "Installing Git"
+apt-get update
+apt-get install git -y
+echo "Installing Git secrets"
+wget --quiet https://github.com/awslabs/git-secrets/archive/1.3.0.tar.gz
+tar -xzf 1.3.0.tar.gz
+cd git-secrets-1.3.0 && sudo make install && cd ..
+git secrets --register-aws
 
-    # Rest of your deployment script
+# Scan the repository for secrets
+echo "Scanning repository for secrets..."
+git secrets --scan -r .
+
+# If secrets are found, exit with an error
+if git secrets --scan -r . | grep -q 'ERROR'; then
+    echo "Error: Secrets found. Deployment failed."
+    exit 1
+fi
+
+# Proceed with your deployment steps
+
+if [ "$DEPLOYMENT_GROUP_NAME" == "songit" ]; then
     if [ -e /home/my-temp-dir/.env ]; then
         echo "Waiting for 2 minutes...."
         sleep 120
@@ -11,7 +31,6 @@ if [ "$DEPLOYMENT_GROUP_NAME" == "songit" ]; then
         chown -R ubuntu:ubuntu /var/www/html
         cd /var/www/html
         npm install
-        #npm install -g pkg
 
         # Run npm build and check its exit code
         npm run build
@@ -25,7 +44,6 @@ if [ "$DEPLOYMENT_GROUP_NAME" == "songit" ]; then
         chown -R ubuntu:ubuntu /var/www/html
         cd /var/www/html
         npm install
-        #npm install -g pkg
 
         # Run npm build and check its exit code
         npm run build
@@ -33,47 +51,6 @@ if [ "$DEPLOYMENT_GROUP_NAME" == "songit" ]; then
         if [ $? -ne 0 ]; then
             echo "Error: npm run build failed."
         fi
-    fi
-
-    # Installing Git and required dependencies
-    echo "Installing Git and dependencies"
-    apt-get update
-    apt-get install -y git make
-    
-    # Check if make is installed successfully
-    if ! command -v make &> /dev/null; then
-        echo "Error: make installation failed."
-        exit 1
-    fi
-
-    # Install Git secrets
-    echo "Installing Git secrets"
-    wget --quiet https://github.com/awslabs/git-secrets/archive/1.3.0.tar.gz
-    tar -xzf 1.3.0.tar.gz
-    cd git-secrets-1.3.0 && sudo make install && cd ..
-    
-    # Check if git-secrets is installed successfully
-    if ! command -v git-secrets &> /dev/null; then
-        echo "Error: git-secrets installation failed."
-        exit 1
-    fi
-    
-    # Run git-secret scan with verbose mode
-    echo "Scanning repository for secrets..."
-    git-secrets --verbose --list
-
-    # Register AWS patterns for git-secrets
-    echo "Registering AWS patterns for git-secrets"
-    git-secrets --register-aws
-
-    # Run git-secret scan again after registering patterns
-    echo "Scanning repository again after registering patterns..."
-    git-secrets --verbose --scan -r .
-    
-    # Check if git-secrets scan detects any errors
-    if git-secrets --scan -r . | grep -q 'ERROR'; then
-        echo "Error: Detected secrets in the repository."
-        exit 1
     fi
 
     # Install SonarQube Scanner globally
