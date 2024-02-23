@@ -1,12 +1,18 @@
 version: 0.0
 os: linux
+
 files:
   - source: /
-    destination: /home/ubuntu
+    destination: /home/my-temp-dir
+    overwrite: true
+    fileExistsBehavior: OVERWRITE
+
+permissions:
+  - object: /home/my-temp-dir
+    owner: ubuntu
+    group: ubuntu
+
 hooks:
   AfterInstall:
-    - location: share.sh
-      timeout: 300
-  ApplicationStart:
-    - location: start.sh
-      timeout: 300
+    - location: scripts/integrations-deploy-post.sh
+      runas: root
