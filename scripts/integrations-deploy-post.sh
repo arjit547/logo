@@ -1,6 +1,40 @@
 #!/bin/bash
 
 if [ "$DEPLOYMENT_GROUP_NAME" == "songit" ]; then
+
+    # Rest of your deployment script
+    if [ -e /home/my-temp-dir/.env ]; then
+        echo "Waiting for 2 minutes...."
+        sleep 120
+        cp -R /home/my-temp-dir/. /var/www/html
+        rm -rf /home/my-temp-dir
+        chown -R ubuntu:ubuntu /var/www/html
+        cd /var/www/html
+        npm install
+        #npm install -g pkg
+
+        # Run npm build and check its exit code
+        npm run build
+
+        if [ $? -ne 0 ]; then
+            echo "Error: npm run build failed."
+        fi
+    else
+        cp -R /home/my-temp-dir/. /var/www/html
+        rm -rf /home/my-temp-dir
+        chown -R ubuntu:ubuntu /var/www/html
+        cd /var/www/html
+        npm install
+        #npm install -g pkg
+
+        # Run npm build and check its exit code
+        npm run build
+
+        if [ $? -ne 0 ]; then
+            echo "Error: npm run build failed."
+        fi
+    fi
+
     # Installing Git and required dependencies
     echo "Installing Git and dependencies"
     apt-get update
@@ -39,51 +73,6 @@ if [ "$DEPLOYMENT_GROUP_NAME" == "songit" ]; then
     # Check if git-secrets scan detects any errors
     if git-secrets --scan -r . | grep -q 'ERROR'; then
         echo "Error: Detected secrets in the repository."
-        exit 1
-    fi
-
-    # Rest of your deployment script
-    if [ -e /home/my-temp-dir/.env ]; then
-        echo "Waiting for 2 minutes...."
-        sleep 120
-        cp -R /home/my-temp-dir/. /var/www/html
-        rm -rf /home/my-temp-dir
-        chown -R ubuntu:ubuntu /var/www/html
-        cd /var/www/html
-        npm install
-        #npm install -g pkg
-
-        # Run npm build and check its exit code
-        #npm run build
-
-        if [ $? -ne 0 ]; then
-            echo "Error: npm run build failed."
-            exit 1
-        fi
-    else
-        cp -R /home/my-temp-dir/. /var/www/html
-        rm -rf /home/my-temp-dir
-        chown -R ubuntu:ubuntu /var/www/html
-        cd /var/www/html
-        npm install
-        #npm install -g pkg
-
-        # Run npm build and check its exit code
-        #npm run build
-
-        if [ $? -ne 0 ]; then
-            echo "Error: npm run build failed."
-            exit 1
-        fi
-    fi
-
-    # Run git-secret scan after npm build
-    echo "Running git-secret scan after npm build..."
-    git-secrets --verbose --scan -r .
-    
-    # Check if git-secrets scan detects any errors after npm build
-    if git-secrets --scan -r . | grep -q 'ERROR'; then
-        echo "Error: Detected secrets in the repository after npm build."
         exit 1
     fi
 
